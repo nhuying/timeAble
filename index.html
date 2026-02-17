@@ -112,7 +112,6 @@
             gap: 10px;
         }
 
-        /* คลาสสำหรับปุ่มกะพริบเรียกร้องความสนใจ */
         .btn-blink {
             animation: blinking 1.5s infinite;
             border: 3px solid #F39C12;
@@ -124,7 +123,6 @@
             100% { background-color: var(--primary-color); box-shadow: 0 0 5px var(--primary-color); }
         }
 
-        /* สไตล์ปุ่มไมโครโฟนสำหรับผู้สูงอายุ */
         .btn-voice {
             background-color: #e8f4fd;
             border: 2px dashed #4A90E2;
@@ -429,8 +427,8 @@
     function speakOutLoud(text) {
         if ('speechSynthesis' in window) {
             const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'th-TH'; // ตั้งค่าเป็นภาษาไทย
-            msg.rate = 0.9; // พูดช้าลงนิดนึงเพื่อผู้สูงอายุ
+            msg.lang = 'th-TH'; 
+            msg.rate = 0.9; 
             window.speechSynthesis.speak(msg);
         }
     }
@@ -438,11 +436,9 @@
     function setRole(role) {
         userData.role = role;
         showScreen('screen-profile');
-        // AI อ่านออกเสียงเมื่อเข้าหน้าโปรไฟล์
         speakOutLoud("เข้าสู่หน้าสร้างโปรไฟล์ กรุณากรอกชื่อ เบอร์โทรศัพท์ และกดปุ่มดึงตำแหน่งพิกัดค่ะ หากพิมพ์ไม่สะดวก สามารถกดปุ่มไมโครโฟนเพื่อพูดได้เลยค่ะ");
     }
 
-    // ฟังก์ชันรับคำสั่งเสียง (STT)
     function startVoiceInput(inputId, buttonId) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
@@ -480,13 +476,23 @@
         recognition.start();
     }
 
+    // อัปเดตฟังก์ชัน getLocation เพิ่มการแจ้ง Error ที่ละเอียดขึ้นสำหรับ Android
     function getLocation() {
         const statusText = document.getElementById("location-status");
         const btnLocation = document.getElementById("btn-location");
-        const btnNext = document.getElementById("btn-next-profile"); // ดึงปุ่มถัดไปมาเพื่อสั่งกะพริบ
+        const btnNext = document.getElementById("btn-next-profile"); 
         
         if (navigator.geolocation) {
             statusText.innerHTML = "กำลังดึงพิกัด กรุณารอสักครู่... ⏳";
+            statusText.style.color = "#4A90E2";
+            
+            // เพิ่ม options สำหรับ Android เพื่อบังคับหาพิกัด GPS แม่นยำ
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            };
+
             navigator.geolocation.getCurrentPosition(
                 function(position) {
                     userData.lat = position.coords.latitude;
@@ -495,15 +501,24 @@
                     statusText.style.color = "green";
                     btnLocation.style.display = "none"; 
                     
-                    // ทำงานเมื่อเสร็จสิ้น: ให้ปุ่มถัดไปกะพริบ และ AI แจ้งเตือน
                     btnNext.classList.add('btn-blink');
                     speakOutLoud("ดึงตำแหน่งเรียบร้อยแล้วค่ะ กรุณากดปุ่มถัดไปที่กำลังกะพริบอยู่ได้เลยค่ะ");
                 },
                 function(error) {
-                    statusText.innerHTML = "❌ ไม่สามารถดึงพิกัดได้";
+                    let errorMsg = "❌ ไม่สามารถดึงพิกัดได้: ";
+                    if(error.code == 1) errorMsg += "คุณยังไม่ได้อนุญาตให้เข้าถึงตำแหน่งในเบราว์เซอร์";
+                    else if(error.code == 2) errorMsg += "มือถือหาพิกัด GPS ไม่เจอ โปรดเช็คว่าเปิด Location ไว้หรือไม่";
+                    else if(error.code == 3) errorMsg += "หมดเวลาในการเชื่อมต่อ กรุณาลองใหม่";
+                    else errorMsg += "เกิดข้อผิดพลาดไม่ทราบสาเหตุ";
+
+                    statusText.innerHTML = errorMsg;
                     statusText.style.color = "red";
-                }
+                    speakOutLoud("ไม่สามารถดึงตำแหน่งได้ กรุณาตรวจสอบการตั้งค่าจีพีเอสในโทรศัพท์ค่ะ");
+                },
+                options // ส่งค่า options เข้าไปเพื่อให้ Android ทำงานได้ดีขึ้น
             );
+        } else {
+            statusText.innerHTML = "อุปกรณ์ของคุณไม่รองรับการระบุตำแหน่ง";
         }
     }
 
@@ -595,7 +610,7 @@
         const btn = document.querySelector('#screen-result .btn-primary');
         btn.innerHTML = 'กำลังบันทึก... ⏳'; btn.disabled = true;
 
-        if (!GOOGLE_WEB_APP_URL || GOOGLE_WEB_APP_URL === "ใส่_URL_WEB_APP_ของคุณที่นี่" || GOOGLE_WEB_APP_URL === "") {
+        if (!GOOGLE_WEB_APP_URL || GOOGLE_WEB_APP_URL === "https://script.google.com/macros/library/d/1uMA8fotRxw1b-7e-Bn2pa1DTheDJPbQuPzXF3m5dXoaYIhQ4blQJIJXh/4" || GOOGLE_WEB_APP_URL === "") {
             alert("กรุณาใส่ URL ของ Google Web App ในโค้ด Javascript ก่อนทดสอบการบันทึกข้อมูลครับ");
             btn.innerHTML = 'บันทึกข้อมูลและเริ่มต้นใช้งาน 🚀'; btn.disabled = false; return;
         }
