@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>timeAble - ธนาคารเวลาวิสาหกิจเพื่อสังคม</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #F39C12;
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-light: #777777;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            color: var(--text-main);
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .btn:hover, .btn:active {
+            border-color: var(--primary-color);
+            background-color: #eaf3fc;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #357abd;
+            border-color: #357abd;
+        }
+
+        .btn-location {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* คลาสสำหรับปุ่มกะพริบเรียกร้องความสนใจ */
+        .btn-blink {
+            animation: blinking 1.5s infinite;
+            border: 3px solid #F39C12;
+        }
+
+        @keyframes blinking {
+            0% { background-color: var(--primary-color); box-shadow: 0 0 5px var(--primary-color); }
+            50% { background-color: #357abd; box-shadow: 0 0 20px #F39C12; }
+            100% { background-color: var(--primary-color); box-shadow: 0 0 5px var(--primary-color); }
+        }
+
+        /* สไตล์ปุ่มไมโครโฟนสำหรับผู้สูงอายุ */
+        .btn-voice {
+            background-color: #e8f4fd;
+            border: 2px dashed #4A90E2;
+            color: #4A90E2;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            width: 100%;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-voice:active { background-color: #d0e7fa; }
+        .voice-recording { background-color: #ffeaea; border-color: #ff4d4d; color: #ff4d4d; }
+
+        input[type="text"], input[type="tel"], textarea, input[type="date"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            gap: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-highlight {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 15px 0;
+            padding: 15px;
+            background: #fff9f0;
+            border-radius: 12px;
+        }
+
+        /* CSS สำหรับ Pop-up Modal (PDPA) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-content h2 { font-size: 20px; margin-bottom: 10px; }
+        .modal-content p, .modal-content ul { font-size: 14px; color: #555; line-height: 1.5; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="pdpa-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>ข้อตกลงและนโยบายความเป็นส่วนตัว (PDPA)</h2>
+        <p>ยินดีต้อนรับสู่แพลตฟอร์ม timeAble เพื่อการจับคู่และให้บริการที่ปลอดภัย เราจำเป็นต้องขอความยินยอมในการเก็บข้อมูลส่วนบุคคลของคุณ ดังนี้:</p>
+        <ul>
+            <li><strong>ข้อมูลที่เก็บ:</strong> ชื่อ, เบอร์โทร, ที่อยู่, พิกัดตำแหน่ง (GPS), วันเกิด, กรุ๊ปเลือด และข้อมูลบุคลิกภาพจากการตอบคำถาม</li>
+            <li><strong>วัตถุประสงค์:</strong> เพื่อนำไปประมวลผลด้วย AI ในการจับคู่จิตอาสาและผู้สูงอายุในรัศมี 10 กิโลเมตร ที่มีความเข้ากันได้ดีที่สุด</li>
+            <li><strong>การปกปิดข้อมูล:</strong> ข้อมูลของคุณจะถูกเก็บรักษาอย่างปลอดภัย และแชร์ให้เฉพาะศูนย์บริการและบัดดี้ที่ระบบจับคู่ให้เท่านั้น</li>
+        </ul>
+        
+        <div style="display: flex; gap: 10px; margin-top: 20px; background: #f0f8ff; padding: 10px; border-radius: 8px;">
+            <input type="checkbox" id="accept-pdpa" style="width: 25px; height: 25px;">
+            <label for="accept-pdpa" style="font-size: 14px; cursor:pointer;"><b>ข้าพเจ้าได้อ่านและยินยอมตามเงื่อนไข</b> (สำหรับผู้ใช้บริการกรอกเอง)</label>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 10px; background: #fff3cd; padding: 10px; border-radius: 8px;">
+            <input type="checkbox" id="accept-pdpa-caregiver" style="width: 25px; height: 25px;">
+            <label for="accept-pdpa-caregiver" style="font-size: 14px; cursor:pointer; color: #856404;"><b>กรณีมีผู้ดูแลกรอกแทน:</b> ข้าพเจ้าเป็นบุตรหลาน/ผู้ดูแล และได้รับความยินยอมจากเจ้าของข้อมูลแล้ว</label>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 15px; font-size: 18px;" onclick="acceptPDPA()">ตกลงและเข้าสู่ระบบ</button>
+    </div>
+</div>
+
+<div class="container">
+    <div id="screen-welcome" class="card active">
+        <h2>ยินดีต้อนรับสู่ timeAble ⏳</h2>
+        <p>เพื่อให้เราหาเพื่อนทำกิจกรรมที่ "เคมีตรงกัน" กับคุณที่สุด เราขอเวลาสัก 2 นาที มาเล่นควิซสนุกๆ กันนะ!</p>
+        <p>คุณกำลังเข้าใช้งานในฐานะ...</p>
+        <div class="btn-group">
+            <button class="btn" onclick="setRole('ผู้รับบริการ (ผู้สูงอายุ)')" style="font-size: 18px; padding: 20px;">👵 ผู้รับบริการ (รับความช่วยเหลือ)</button>
+            <button class="btn" onclick="setRole('อาสาสมัคร (ผู้สะสมเวลา)')" style="font-size: 18px; padding: 20px;">🤝 อาสาสมัคร (ผู้สะสมเวลา)</button>
+        </div>
+    </div>
+
+    <div id="screen-profile" class="card">
+        <h2>📝 สร้างโปรไฟล์ของคุณ</h2>
+        <p>ข้อมูลพื้นฐานสำหรับการติดต่อ</p>
+        
+        <input type="text" id="input-name" placeholder="ชื่อ - นามสกุล" required>
+        <button type="button" class="btn-voice" id="btn-voice-name" onclick="startVoiceInput('input-name', 'btn-voice-name')">
+            🎙️ กดปุ่มนี้แล้วพูดชื่อของคุณ
+        </button>
+
+        <input type="tel" id="input-phone" placeholder="เบอร์โทรศัพท์ติดต่อ" required>
+        
+        <textarea id="input-address" placeholder="ระบุรายละเอียดที่อยู่เพิ่มเติม (บ้านเลขที่, ซอย, ถนน)"></textarea>
+        <button type="button" class="btn-voice" id="btn-voice-address" onclick="startVoiceInput('input-address', 'btn-voice-address')">
+            🎙️ กดปุ่มนี้แล้วพูดที่อยู่ของคุณ
+        </button>
+
+        <button type="button" class="btn btn-location" onclick="getLocation()" id="btn-location" style="padding: 15px; font-size: 18px;">
+            📍 กดเพื่อดึงตำแหน่งพิกัดปัจจุบัน
+        </button>
+        <p id="location-status" style="font-size: 13px; color: #4A90E2; margin-top: -10px; margin-bottom: 15px; font-weight: bold;"></p>
+        
+        <button class="btn btn-primary" id="btn-next-profile" style="width:100%; font-size: 18px;" onclick="saveProfile()">ถัดไป ➔</button>
+    </div>
+
+    <div id="screen-skills" class="card">
+        <h2>🎯 ความสนใจและทักษะ</h2>
+        <p>โปรดเลือกสิ่งที่คุณต้องการรับบริการ (หรือสิ่งที่คุณสามารถช่วยได้)</p>
+        <div class="checkbox-group" id="skills-group">
+            <label><input type="checkbox" value="พูดคุยคลายเหงา"> พูดคุยคลายเหงา / ฟังเรื่องเล่า</label>
+            <label><input type="checkbox" value="พาไปโรงพยาบาล"> พาไปโรงพยาบาล / พบแพทย์</label>
+            <label><input type="checkbox" value="ออกกำลังกายเบาๆ"> ออกกำลังกายเบาๆ / เดินสวน</label>
+            <label><input type="checkbox" value="ศิลปะและดนตรี"> กิจกรรมศิลปะ / ดนตรีบำบัด</label>
+            <label><input type="checkbox" value="ทำอาหาร"> ทำอาหาร / โภชนาการ</label>
+        </div>
+        <input type="text" id="input-skill-other" placeholder="อื่นๆ โปรดระบุ (เช่น ซ่อมท่อ, สอนคอมพิวเตอร์)..." style="margin-top: 5px;">
+        <button class="btn btn-primary" style="width:100%; margin-top: 15px;" onclick="saveSkills()">ถัดไป ➔</button>
+    </div>
+
+    <div id="screen-time" class="card">
+        <h2>⏰ ช่วงเวลาที่สะดวก</h2>
+        <p>คุณสะดวกทำกิจกรรมในช่วงเวลาใดบ้าง? (เลือกได้มากกว่า 1 ข้อ)</p>
+        <div class="checkbox-group" id="time-group">
+            <label><input type="checkbox" value="จันทร์-ศุกร์ (เช้า)"> จันทร์ - ศุกร์ (ช่วงเช้า)</label>
+            <label><input type="checkbox" value="จันทร์-ศุกร์ (บ่าย)"> จันทร์ - ศุกร์ (ช่วงบ่าย)</label>
+            <label><input type="checkbox" value="เสาร์-อาทิตย์ (เช้า)"> เสาร์ - อาทิตย์ (ช่วงเช้า)</label>
+            <label><input type="checkbox" value="เสาร์-อาทิตย์ (บ่าย)"> เสาร์ - อาทิตย์ (ช่วงบ่าย)</label>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="saveTimeSlots()">เริ่มทำควิซทายใจ ➔</button>
+    </div>
+
+    <div id="screen-q1" class="card">
+        <h2>🎂 หมวดที่ 1: รหัสลับดวงดาว</h2>
+        <p>ให้เราทายจังหวะชีวิตของคุณ! วันเกิดของคุณคือวันไหนเอ่ย?</p>
+        <input type="date" id="dob-input" required>
+        <button class="btn btn-primary" onclick="processDOB()">ไปข้อต่อไป ➔</button>
+    </div>
+
+    <div id="screen-q2" class="card">
+        <h2>☕ ของว่างสไตล์คุณ</h2>
+        <p>สมมติว่าวันนี้คุณแวะมาที่ศูนย์ของเรา คุณอยากให้เราเตรียมของว่างแบบไหนรอต้อนรับดี? (แอบกระซิบว่าบอก 'กรุ๊ปเลือด' ของคุณมาได้เลยนะ)</p>
+        <div class="btn-group">
+            <button class="btn" onclick="setBloodType('A')">กรุ๊ป A (สายเป๊ะ สุขภาพต้องมาก่อน)</button>
+            <button class="btn" onclick="setBloodType('B')">กรุ๊ป B (สายชิลล์ อะไรก็อร่อย)</button>
+            <button class="btn" onclick="setBloodType('O')">กรุ๊ป O (สายเนื้อเน้นๆ พลังงานล้นเหลือ)</button>
+            <button class="btn" onclick="setBloodType('AB')">กรุ๊ป AB (สายมีสไตล์ ขอรสชาติไม่จำเจ)</button>
+        </div>
+    </div>
+
+    <div id="screen-q3" class="card">
+        <h2>🎭 หมวดที่ 2: ถอดรหัสใจ</h2>
+        <p>ถ้าสุดสัปดาห์นี้มีนัดทำกิจกรรมกลุ่มกับเพื่อนใหม่ สิ่งแรกที่คุณมักจะนึกถึงคืออะไร?</p>
+        <div class="btn-group">
+            <button class="btn" onclick="setEnneagramGroup('heart')">💖 "ทุกคนจะโอเคไหมนะ? อยากให้บรรยากาศอบอุ่นและเข้ากันได้ดีจัง"</button>
+            <button class="btn" onclick="setEnneagramGroup('head')">🧠 "เราต้องเตรียมตัวยังไงบ้าง? แผนคืออะไร ขอข้อมูลเป๊ะๆ จะได้อุ่นใจ"</button>
+            <button class="btn" onclick="setEnneagramGroup('gut')">✊ "เอาเลย ลุย! ไม่ต้องคิดเยอะ ปล่อยจอยตามสัญชาตญาณ เอาที่สบายใจ"</button>
+        </div>
+    </div>
+
+    <div id="screen-q4-heart" class="card">
+        <h2>💖 สไตล์การดูแลของคุณ</h2>
+        <p>เวลาที่คนรอบข้างเจอเรื่องหนักใจ สไตล์การซัพพอร์ตของคุณคือแบบไหน?</p>
+        <div class="btn-group">
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 2 - ผู้ให้ 🤲')">รีบเข้าไปช่วยดูแล เทคแคร์ทันที</button>
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 3 - นักลงมือทำ 🏆')">ให้กำลังใจด้วยการพาไปทำกิจกรรมให้รู้สึกดีขึ้น</button>
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 4 - ผู้ลึกซึ้ง 🎨')">นั่งฟังเงียบๆ ซึมซับความรู้สึกและเป็นพื้นที่ปลอดภัยให้เขา</button>
+        </div>
+    </div>
+
+    <div id="screen-q4-head" class="card">
+        <h2>🧠 พื้นที่ปลอดภัยของคุณ</h2>
+        <p>เวลาเจอเรื่องที่คาดไม่ถึง สิ่งที่จะทำให้คุณรู้สึก 'ปลอดภัย' ที่สุดคืออะไร?</p>
+        <div class="btn-group">
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 5 - นักสังเกตการณ์ 🦉')">ขอเวลาส่วนตัวเงียบๆ ถอยมาคิดทบทวนหาเหตุผล</button>
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 6 - นักระแวดระวัง 🛡️')">หันไปปรึกษาคนที่เชื่อใจ หรือเช็คความชัวร์อีกรอบ</button>
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 7 - ผู้กระตือรือร้น ✨')">หาทางเลือกใหม่ๆ หรือมองหาเรื่องสนุกๆ มาเบี่ยงเบนความเครียด</button>
+        </div>
+    </div>
+
+    <div id="screen-q4-gut" class="card">
+        <h2>✊ บทบาทที่คุณถนัด</h2>
+        <p>ถ้าต้องทำงานร่วมกับคนเยอะๆ บทบาทที่คุณมักจะได้รับ (หรือชอบเป็น) คือ...</p>
+        <div class="btn-group">
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 8 - เจ้านาย 🦁')">เป็นผู้นำ ตัดสินใจเด็ดขาด ปกป้องคนในทีมได้</button>
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 9 - ผู้ประสานสิบทิศ 🕊️')">เป็นคนคอยไกล่เกลี่ย สบายๆ คล้อยตามได้เพื่อความสงบสุข</button>
+            <button class="btn" onclick="setEnneagramResult('ลักษณ์ 1 - ผู้สมบูรณ์แบบ 📏')">เป็นคนคอยตรวจความเรียบร้อย ทุกอย่างต้องถูกต้องตามกติกา</button>
+        </div>
+    </div>
+
+    <div id="screen-processing" class="card">
+        <div class="loading-spinner"></div>
+        <h2>กำลังถอดรหัสลับของคุณ...</h2>
+        <p>AI ของเรากำลังวิเคราะห์ความเข้ากันได้ เพื่อเตรียมสร้างประสบการณ์ที่ดีที่สุดให้กับคุณ</p>
+    </div>
+
+    <div id="screen-result" class="card">
+        <h2>เย้! เรารู้จักคุณมากขึ้นแล้วนะ 😊</h2>
+        <div id="result-text" class="result-highlight"></div>
+        <p>ข้อมูลนี้จะช่วยให้ timeAble แนะนำกิจกรรมที่ใช่ และจับคู่คุณกับบัดดี้ (Buddy) ที่เข้ากับสไตล์ของคุณได้อย่างลงตัวที่สุด...</p>
+        <p>พร้อมไปสะสมความสุขและเวลาด้วยกันหรือยัง?</p>
+        <button class="btn btn-primary" style="width: 100%;" onclick="submitData()">บันทึกข้อมูลและเริ่มต้นใช้งาน 🚀</button>
+    </div>
+
+</div>
+
+<script>
+    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyawul0tMC8QxQtC38yRp-ukekuOzihC6FZtF90jm6E3QIksLIC0XrlqFCD8HprjmHRbQ/exec"; 
+
+    let userData = {
+        name: '', phone: '', address: '', lat: '', lng: '', role: '',
+        skills: [], timeSlots: [], dob: '', zodiac: '', element: '',
+        bloodType: '', enneagramGroup: '', enneagramResult: ''
+    };
+
+    window.onload = function() {
+        document.getElementById('pdpa-modal').classList.remove('hidden');
+    };
+
+    function acceptPDPA() {
+        const checkSelf = document.getElementById('accept-pdpa').checked;
+        const checkCaregiver = document.getElementById('accept-pdpa-caregiver').checked;
+        
+        if (checkSelf || checkCaregiver) {
+            document.getElementById('pdpa-modal').classList.add('hidden');
+        } else {
+            alert("กรุณากดยอมรับเงื่อนไขช่องใดช่องหนึ่ง ก่อนเข้าใช้งานระบบครับ");
+        }
+    }
+
+    function showScreen(screenId) {
+        const screens = document.querySelectorAll('.card');
+        screens.forEach(screen => { screen.classList.remove('active'); });
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    // ฟังก์ชัน AI อ่านออกเสียง (TTS)
+    function speakOutLoud(text) {
+        if ('speechSynthesis' in window) {
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'th-TH'; // ตั้งค่าเป็นภาษาไทย
+            msg.rate = 0.9; // พูดช้าลงนิดนึงเพื่อผู้สูงอายุ
+            window.speechSynthesis.speak(msg);
+        }
+    }
+
+    function setRole(role) {
+        userData.role = role;
+        showScreen('screen-profile');
+        // AI อ่านออกเสียงเมื่อเข้าหน้าโปรไฟล์
+        speakOutLoud("เข้าสู่หน้าสร้างโปรไฟล์ กรุณากรอกชื่อ เบอร์โทรศัพท์ และกดปุ่มดึงตำแหน่งพิกัดค่ะ หากพิมพ์ไม่สะดวก สามารถกดปุ่มไมโครโฟนเพื่อพูดได้เลยค่ะ");
+    }
+
+    // ฟังก์ชันรับคำสั่งเสียง (STT)
+    function startVoiceInput(inputId, buttonId) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("เบราว์เซอร์ของคุณไม่รองรับระบบสั่งการด้วยเสียง แนะนำให้ใช้ Google Chrome ครับ");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'th-TH';
+        const btn = document.getElementById(buttonId);
+        
+        recognition.onstart = function() {
+            btn.classList.add('voice-recording');
+            btn.innerHTML = "🔴 กำลังฟัง... พูดได้เลยครับ";
+            speakOutLoud("พูดได้เลยค่ะ");
+        };
+
+        recognition.onsuccess = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById(inputId).value = transcript;
+            btn.classList.remove('voice-recording');
+            btn.innerHTML = "✅ รับข้อความสำเร็จ (กดเพื่อพูดใหม่)";
+        };
+
+        recognition.onerror = function() {
+            btn.classList.remove('voice-recording');
+            btn.innerHTML = "🎙️ ลองพูดใหม่อีกครั้ง";
+            speakOutLoud("ขออภัยค่ะ ฟังไม่ชัด กรุณากดพูดใหม่อีกครั้งนะคะ");
+        };
+
+        recognition.onend = function() {
+            btn.classList.remove('voice-recording');
+        }
+
+        recognition.start();
+    }
+
+    function getLocation() {
+        const statusText = document.getElementById("location-status");
+        const btnLocation = document.getElementById("btn-location");
+        const btnNext = document.getElementById("btn-next-profile"); // ดึงปุ่มถัดไปมาเพื่อสั่งกะพริบ
+        
+        if (navigator.geolocation) {
+            statusText.innerHTML = "กำลังดึงพิกัด กรุณารอสักครู่... ⏳";
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    userData.lat = position.coords.latitude;
+                    userData.lng = position.coords.longitude;
+                    statusText.innerHTML = "✅ บันทึกพิกัดตำแหน่งเรียบร้อยแล้ว";
+                    statusText.style.color = "green";
+                    btnLocation.style.display = "none"; 
+                    
+                    // ทำงานเมื่อเสร็จสิ้น: ให้ปุ่มถัดไปกะพริบ และ AI แจ้งเตือน
+                    btnNext.classList.add('btn-blink');
+                    speakOutLoud("ดึงตำแหน่งเรียบร้อยแล้วค่ะ กรุณากดปุ่มถัดไปที่กำลังกะพริบอยู่ได้เลยค่ะ");
+                },
+                function(error) {
+                    statusText.innerHTML = "❌ ไม่สามารถดึงพิกัดได้";
+                    statusText.style.color = "red";
+                }
+            );
+        }
+    }
+
+    function saveProfile() {
+        const name = document.getElementById('input-name').value;
+        const phone = document.getElementById('input-phone').value;
+        const addr = document.getElementById('input-address').value;
+
+        if(!name || !phone) {
+            alert("กรุณากรอกชื่อและเบอร์โทรศัพท์ให้ครบถ้วนครับ"); return;
+        }
+        if(userData.lat === '' || userData.lng === '') {
+            alert("กรุณากดปุ่ม 'ดึงตำแหน่งปัจจุบัน' ด้วยครับ 📍"); return;
+        }
+
+        userData.name = name; userData.phone = phone; userData.address = addr;
+        showScreen('screen-skills');
+    }
+
+    function saveSkills() {
+        const checkboxes = document.querySelectorAll('#skills-group input[type="checkbox"]:checked');
+        userData.skills = Array.from(checkboxes).map(cb => cb.value);
+        const otherSkill = document.getElementById('input-skill-other').value.trim();
+        if (otherSkill !== "") { userData.skills.push(otherSkill); }
+
+        if(userData.skills.length === 0) {
+            alert("กรุณาเลือกความสนใจ หรือระบุทักษะเพิ่มเติมอย่างน้อย 1 อย่างครับ"); return;
+        }
+        showScreen('screen-time');
+    }
+
+    function saveTimeSlots() {
+        const checkboxes = document.querySelectorAll('#time-group input[type="checkbox"]:checked');
+        userData.timeSlots = Array.from(checkboxes).map(cb => cb.value);
+        if(userData.timeSlots.length === 0) {
+            alert("กรุณาเลือกช่วงเวลาที่สะดวกอย่างน้อย 1 ช่วงครับ"); return;
+        }
+        showScreen('screen-q1');
+    }
+
+    function processDOB() {
+        const dobInput = document.getElementById('dob-input').value;
+        if (!dobInput) { alert('กรุณาเลือกวันเกิดของคุณก่อนนะคะ 😊'); return; }
+        
+        userData.dob = dobInput;
+        const date = new Date(dobInput);
+        const day = date.getDate(); const month = date.getMonth() + 1; 
+
+        let zodiac = "ไม่ระบุ"; let element = "ไม่ระบุ";
+
+        if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) { zodiac = "ราศีเมษ"; element = "ไฟ"; }
+        else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) { zodiac = "ราศีพฤษภ"; element = "ดิน"; }
+        else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) { zodiac = "ราศีเมถุน"; element = "ลม"; }
+        else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) { zodiac = "ราศีกรกฎ"; element = "น้ำ"; }
+        else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) { zodiac = "ราศีสิงห์"; element = "ไฟ"; }
+        else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) { zodiac = "ราศีกันย์"; element = "ดิน"; }
+        else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) { zodiac = "ราศีตุลย์"; element = "ลม"; }
+        else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) { zodiac = "ราศีพิจิก"; element = "น้ำ"; }
+        else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) { zodiac = "ราศีธนู"; element = "ไฟ"; }
+        else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) { zodiac = "ราศีมังกร"; element = "ดิน"; }
+        else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) { zodiac = "ราศีกุมภ์"; element = "ลม"; }
+        else if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) { zodiac = "ราศีมีน"; element = "น้ำ"; }
+
+        userData.zodiac = zodiac; userData.element = element;
+        showScreen('screen-q2');
+    }
+
+    function setBloodType(type) { userData.bloodType = type; showScreen('screen-q3'); }
+
+    function setEnneagramGroup(group) {
+        userData.enneagramGroup = group;
+        if (group === 'heart') showScreen('screen-q4-heart');
+        else if (group === 'head') showScreen('screen-q4-head');
+        else if (group === 'gut') showScreen('screen-q4-gut');
+    }
+
+    function setEnneagramResult(result) {
+        userData.enneagramResult = result;
+        showScreen('screen-processing');
+        setTimeout(() => { prepareResultPage(); showScreen('screen-result'); }, 3000);
+    }
+
+    function prepareResultPage() {
+        const resultContainer = document.getElementById('result-text');
+        resultContainer.innerHTML = `คุณ ${userData.name} เป็นคน <span style="color:var(--primary-color);">ธาตุ${userData.element}</span> ที่มีความลึกซึ้งแบบ <br><span style="font-size: 24px;">${userData.enneagramResult}</span>`;
+    }
+
+    function submitData() {
+        const btn = document.querySelector('#screen-result .btn-primary');
+        btn.innerHTML = 'กำลังบันทึก... ⏳'; btn.disabled = true;
+
+        if (!GOOGLE_WEB_APP_URL || GOOGLE_WEB_APP_URL === "ใส่_URL_WEB_APP_ของคุณที่นี่" || GOOGLE_WEB_APP_URL === "") {
+            alert("กรุณาใส่ URL ของ Google Web App ในโค้ด Javascript ก่อนทดสอบการบันทึกข้อมูลครับ");
+            btn.innerHTML = 'บันทึกข้อมูลและเริ่มต้นใช้งาน 🚀'; btn.disabled = false; return;
+        }
+
+        const dataToSave = { ...userData, skillsText: userData.skills.join(", "), timeSlotsText: userData.timeSlots.join(", ") };
+
+        fetch(GOOGLE_WEB_APP_URL, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dataToSave)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert('บันทึกข้อมูลเรียบร้อยแล้ว!'); location.reload(); 
+            } else {
+                alert('เกิดข้อผิดพลาด: ' + data.message); btn.innerHTML = 'ลองใหม่อีกครั้ง'; btn.disabled = false;
+            }
+        }).catch(error => {
+            alert('ระบบได้รับข้อมูลของคุณแล้ว!'); location.reload();
+        });
+    }
+</script>
+
+</body>
+</html>
